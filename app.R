@@ -40,14 +40,11 @@ library(shinyalert)
 
 faculty_test <- read_csv(here("data", "faculty_test.csv"))
 
+faculty_list <- read_csv(here("data", "faculty_list.csv"))
 
-# #helpful code tips:
-# output$table <- renderTable({
-#   table_df %>%
-#     mutate(tmp = '<a href="https://github.com">blah</a>',
-#            img = '<img src="https://www.fws.gov/fisheries/freshwater-fish-of-america/images/originals/east_cold/American_shad_DuaneRavenArt.fw.png"></img>')
-# }, sanitize.text.function = function(x) x)
-# 
+
+
+
 # #And to make those links responsive to your data:
 # table_df %>%
 #   mutate(website_html = sprintf('<a href="%s">UCSB website</a>', website_url),
@@ -112,21 +109,22 @@ ui <- fluidPage(
                         value = "Food_tab",
                         sidebarLayout(
                             sidebarPanel(h3("Explore Faculty", class = "text-success"),
-                                         checkboxGroupInput("checkGroup", label = h3("Select Specializations:"),
-                                                            choices = list("Fisheries & Aquaculture" = 1,
-                                                                           "Economics & Policy" = 2,
-                                                                           "Soil" = 3,
-                                                                           "Land Use" = 4,
-                                                                           "Agriculture" = 5,
-                                                                           "Ecology & Conservation" = 6,
-                                                                           "Social Sciences & Anthropology" = 7,
-                                                                           "Physical science & Engineering" = 8,
-                                                                           "Climate Change" = 9),
-                                                            selected = 1)),
+                                         checkboxGroupInput("food_special", label = h3("Select Specializations:"),
+                                                            # choices = list("Fisheries & Aquaculture" = 1,
+                                                            #                "Economics & Policy" = 2,
+                                                            #                "Soil" = 3,
+                                                            #                "Land Use" = 4,
+                                                            #                "Agriculture" = 5,
+                                                            #                "Ecology & Conservation" = 6,
+                                                            #                "Social Sciences & Anthropology" = 7,
+                                                            #                "Physical science & Engineering" = 8,
+                                                            #                "Climate Change" = 9),
+                                                            # selected = 1)),
+                            choices = unique(faculty_list$specialization))),
                                          # hr(),
                                          # fluidRow(column(3, verbatimTextOutput("value"))),
-                         mainPanel(h1("Food Faculty", class = "text-secondary"))
-                                   # dataTableOutput("table")
+                         mainPanel(h1("Food Faculty", class = "text-secondary"),
+                                   tableOutput("table"))
                                    
          )),
          
@@ -167,11 +165,30 @@ server <- function(input, output) {
   #   subset(faculty_test, specialization %in% input$specialization, select = "name")
   # })
   
-  #Select Widget
-  # output$value <- renderPrint({ input$select })
-  
   #Checkbox Widget
-  output$value <- renderPrint({ input$checkGroup })
+  # output$value <- renderPrint({ input$checkGroup })
+  
+  ####Food Tab####
+  #Food input df
+  table_df_food <- reactive({
+    faculty_list %>%
+      filter(specialization %in% input$food_special) %>% 
+      select(department, name, email, role, website_url)
+      # mutate(website_html = sprintf('<a href="%s">UCSB website</a>', website_url),
+      #      image_html = sprintf('<img src="%s"></img>', image_url))
+      # 
+  })
+  
+  #Food output table
+  output$table <- renderTable({
+    table_df_food()
+    
+  })
+  #   table_df_food %>%
+  #     mutate(tmp = '<a href="https://github.com">blah</a>',
+  #            img = '<img src="https://www.fws.gov/fisheries/freshwater-fish-of-america/images/originals/east_cold/American_shad_DuaneRavenArt.fw.png"></img>')
+  # }, sanitize.text.function = function(x) x)
+  
   
 #   #Homepage images to tabs
 #   shinyjs::onclick("food_home",  updateTabsetPanel(session, inputId="navbar", selected="tab2"))
