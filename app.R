@@ -42,8 +42,7 @@ faculty_test <- read_csv(here("data", "faculty_test.csv"))
 
 faculty_list <- read_csv(here("data", "faculty_list.csv"))
 
-
-
+faculty_list_comma <- read_csv(here("data", "faculty_list_comma.csv"))
 
 # #And to make those links responsive to your data:
 # table_df %>%
@@ -159,21 +158,21 @@ ui <- fluidPage(
 #--------------------------
 
 server <- function(input, output) {
-  
-  #Food tab test
-  # output$table <- renderDataTable({
-  #   subset(faculty_test, specialization %in% input$specialization, select = "name")
-  # })
-  
-  #Checkbox Widget
-  # output$value <- renderPrint({ input$checkGroup })
-  
+
   ####Food Tab####
   #Food input df
   table_df_food <- reactive({
     faculty_list %>%
       filter(specialization %in% input$food_special) %>% 
-      select(department, name, email, role, website_url)
+      select(department, name, email, role, website_url) %>% 
+      rename("Department" = department,
+             "Name" = name,
+             "Email" = email,
+             "Role" = role,
+             "UCSB Website" = website_url)
+    
+    # names(faculty_list) <- c('Department', 'Name', 'Email', 'Role', 'UCSB Website')
+      
       # mutate(website_html = sprintf('<a href="%s">UCSB website</a>', website_url),
       #      image_html = sprintf('<img src="%s"></img>', image_url))
       # 
@@ -201,3 +200,16 @@ server <- function(input, output) {
 #--------------------------
 
 shinyApp(ui = ui, server = server)
+
+
+#--------------------------
+# Parking Lot
+#--------------------------
+
+#Checkbox Widget
+# output$value <- renderPrint({ input$checkGroup })
+
+#Food tab test
+# output$table <- renderDataTable({
+#   subset(faculty_test, specialization %in% input$specialization, select = "name")
+# })
