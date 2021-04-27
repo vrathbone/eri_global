@@ -41,6 +41,19 @@ library(shinyalert)
 faculty_test <- read_csv(here("data", "faculty_test.csv"))
 
 
+# #helpful code tips:
+# output$table <- renderTable({
+#   table_df %>%
+#     mutate(tmp = '<a href="https://github.com">blah</a>',
+#            img = '<img src="https://www.fws.gov/fisheries/freshwater-fish-of-america/images/originals/east_cold/American_shad_DuaneRavenArt.fw.png"></img>')
+# }, sanitize.text.function = function(x) x)
+# 
+# #And to make those links responsive to your data:
+# table_df %>%
+#   mutate(website_html = sprintf('<a href="%s">UCSB website</a>', website_url),
+#          image_html   = sprintf('<img src="%s"></img>', image_url))
+
+
 #----------------------------------
 #Create the user interface:
 #----------------------------------
@@ -99,13 +112,22 @@ ui <- fluidPage(
                         value = "Food_tab",
                         sidebarLayout(
                             sidebarPanel(h3("Explore Faculty", class = "text-success"),
-                                         selectInput(inputId = "specialization", 
-                                                     label = h3("Select a specialization:"), 
-                                                     choices = list("Fisheries" = 1, "Policy" = 2, "Soil" = 3, "Land Use" = 4, "Agriculture" = 5), 
-                                                     selected = 1)),
-                         mainPanel(h1("Food Faculty", class = "text-secondary"),
-                                   dataTableOutput("table")
-                                   )
+                                         checkboxGroupInput("checkGroup", label = h3("Select Specializations:"),
+                                                            choices = list("Fisheries & Aquaculture" = 1,
+                                                                           "Economics & Policy" = 2,
+                                                                           "Soil" = 3,
+                                                                           "Land Use" = 4,
+                                                                           "Agriculture" = 5,
+                                                                           "Ecology & Conservation" = 6,
+                                                                           "Social Sciences & Anthropology" = 7,
+                                                                           "Physical science & Engineering" = 8,
+                                                                           "Climate Change" = 9),
+                                                            selected = 1)),
+                                         # hr(),
+                                         # fluidRow(column(3, verbatimTextOutput("value"))),
+                         mainPanel(h1("Food Faculty", class = "text-secondary"))
+                                   # dataTableOutput("table")
+                                   
          )),
          
                 ####WATER Tab####
@@ -141,15 +163,18 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   #Food tab test
-  output$table <- renderDataTable({
-    subset(faculty_test, specialization %in% input$specialization, select = "name")
-  })
+  # output$table <- renderDataTable({
+  #   subset(faculty_test, specialization %in% input$specialization, select = "name")
+  # })
   
   #Select Widget
-  output$value <- renderPrint({ input$select })
+  # output$value <- renderPrint({ input$select })
   
-  #Homepage images to tabs
-  shinyjs::onclick("food_home",  updateTabsetPanel(session, inputId="navbar", selected="tab2"))
+  #Checkbox Widget
+  output$value <- renderPrint({ input$checkGroup })
+  
+#   #Homepage images to tabs
+#   shinyjs::onclick("food_home",  updateTabsetPanel(session, inputId="navbar", selected="tab2"))
 
 }
 
