@@ -40,14 +40,21 @@ library(shinyalert)
 
 faculty_test <- read_csv(here("data", "faculty_test.csv"))
 
-faculty_list <- read_csv(here("data", "faculty_list.csv"))
+faculty_list <- read_csv(here("data", "faculty_list.csv")) %>% 
+  mutate(spec_single = str_split(specialization, ';')) %>% 
+  unnest(spec_single) %>% 
+  mutate(website_url = sprintf('<a href="%s">UCSB website</a>', website_url),
+         image_url = sprintf('<img src="%s"></img>', image_url))
 
-faculty_list_comma <- read_csv(here("data", "faculty_list_comma.csv"))
 
 # #And to make those links responsive to your data:
 # table_df %>%
 #   mutate(website_html = sprintf('<a href="%s">UCSB website</a>', website_url),
 #          image_html   = sprintf('<img src="%s"></img>', image_url))
+
+# #How to separate specializations using str_detect:
+# filter(str_detect(specialization, paste0(input$checkbox_checked, collapse = '|'))
+#        which turns the input$checkbox_checked vector into a pattern of values separated by | which is interpreted as “or” (so, do you detect checkbox 1 OR checkbox 2 OR so on…)
 
 
 #----------------------------------
@@ -119,7 +126,7 @@ ui <- fluidPage(
                                                             #                "Physical science & Engineering" = 8,
                                                             #                "Climate Change" = 9),
                                                             # selected = 1)),
-                            choices = unique(faculty_list$specialization))),
+                            choices = unique(faculty_list$spec_single))),
                                          # hr(),
                                          # fluidRow(column(3, verbatimTextOutput("value"))),
                          mainPanel(h1("Food Faculty", class = "text-secondary"),
@@ -163,31 +170,21 @@ server <- function(input, output) {
   #Food input df
   table_df_food <- reactive({
     faculty_list %>%
-      filter(specialization %in% input$food_special) %>% 
-      select(department, name, email, role, website_url) %>% 
-      rename("Department" = department,
+      filter(spec_single %in% input$food_special) %>% 
+      select(image_url, department, name, email, role, website_url) %>% 
+      rename("-" = image_url,
+             "Department" = department,
              "Name" = name,
              "Email" = email,
              "Role" = role,
              "UCSB Website" = website_url)
-    
-    # names(faculty_list) <- c('Department', 'Name', 'Email', 'Role', 'UCSB Website')
-      
-      # mutate(website_html = sprintf('<a href="%s">UCSB website</a>', website_url),
-      #      image_html = sprintf('<img src="%s"></img>', image_url))
-      # 
+
   })
   
   #Food output table
   output$table <- renderTable({
     table_df_food()
-    
-  })
-  #   table_df_food %>%
-  #     mutate(tmp = '<a href="https://github.com">blah</a>',
-  #            img = '<img src="https://www.fws.gov/fisheries/freshwater-fish-of-america/images/originals/east_cold/American_shad_DuaneRavenArt.fw.png"></img>')
-  # }, sanitize.text.function = function(x) x)
-  
+  }, sanitize.text.function = function(x)x)
   
 #   #Homepage images to tabs
 #   shinyjs::onclick("food_home",  updateTabsetPanel(session, inputId="navbar", selected="tab2"))
