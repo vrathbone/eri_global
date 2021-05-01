@@ -38,19 +38,11 @@ library(shinyalert)
 #Read in data
 #----------------------------------
 
-faculty_test <- read_csv(here("data", "faculty_test.csv"))
-
 faculty_list <- read_csv(here("data", "faculty_list.csv")) %>% 
-  mutate(spec_single = str_split(specialization, ';')) %>% 
-  unnest(spec_single) %>% 
+  mutate(spec_single = str_split(specialization, ';')) %>%
+  unnest(spec_single) %>%
   mutate(website_url = sprintf('<a href="%s">UCSB website</a>', website_url),
          image_url = sprintf('<img src="%s"></img>', image_url))
-
-
-# #And to make those links responsive to your data:
-# table_df %>%
-#   mutate(website_html = sprintf('<a href="%s">UCSB website</a>', website_url),
-#          image_html   = sprintf('<img src="%s"></img>', image_url))
 
 # #How to separate specializations using str_detect:
 # filter(str_detect(specialization, paste0(input$checkbox_checked, collapse = '|'))
@@ -61,7 +53,12 @@ faculty_list <- read_csv(here("data", "faculty_list.csv")) %>%
 #Create the user interface:
 #----------------------------------
 ui <- fluidPage(
-    navbarPage("ERI Global",
+    # navbarPage(title = div("ERI Global", 
+    #                        img(src = "global_food_logo_white.png", 
+    #                            height = "10px",
+    #                            width = "100px",
+    #                            style = "position: auto; top: -3px; right: -1000px;")),
+      navbarPage("ERI GLOBAL",
                theme = shinytheme("darkly"),
                #theme = "style/style.css",
 
@@ -115,7 +112,7 @@ ui <- fluidPage(
                         value = "Food_tab",
                         sidebarLayout(
                             sidebarPanel(h3("Explore Faculty", class = "text-success"),
-                                         checkboxGroupInput("food_special", label = h3("Select Specializations:"),
+                                         checkboxGroupInput("food_checkbox", label = h3("Select Specializations:"),
                                                             # choices = list("Fisheries & Aquaculture" = 1,
                                                             #                "Economics & Policy" = 2,
                                                             #                "Soil" = 3,
@@ -170,7 +167,8 @@ server <- function(input, output) {
   #Food input df
   table_df_food <- reactive({
     faculty_list %>%
-      filter(spec_single %in% input$food_special) %>% 
+      filter(spec_single %in% input$food_checkbox) %>%
+      # filter(str_detect(specialization, paste0(input$food_checkbox, collapse = '|'))) %>%
       select(image_url, department, name, email, role, website_url) %>% 
       rename("-" = image_url,
              "Department" = department,
@@ -178,6 +176,10 @@ server <- function(input, output) {
              "Email" = email,
              "Role" = role,
              "UCSB Website" = website_url)
+      # mutate(id = as.numeric(factor(spec_single))) %>%
+      # pivot_wider(spec_single,
+      #             names_from = spec_single,
+      #             values_from = id)
 
   })
   
