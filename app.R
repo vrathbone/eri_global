@@ -39,8 +39,8 @@ library(shinyalert)
 #----------------------------------
 
 faculty_list <- read_csv(here("data", "faculty_list.csv")) %>% 
-  mutate(spec_single = str_split(specialization, ';')) %>%
-  unnest(spec_single) %>%
+  # mutate(spec_single = str_split(specialization, ';')) %>%
+  # unnest(spec_single) %>%
   mutate(website_url = sprintf('<a href="%s">UCSB website</a>', website_url),
          image_url = sprintf('<img src="%s"></img>', image_url))
 
@@ -53,11 +53,9 @@ faculty_list <- read_csv(here("data", "faculty_list.csv")) %>%
 #Create the user interface:
 #----------------------------------
 ui <- fluidPage(
-    # navbarPage(title = div("ERI Global", 
-    #                        img(src = "global_food_logo_white.png", 
-    #                            height = "10px",
-    #                            width = "100px",
-    #                            style = "position: auto; top: -3px; right: -1000px;")),
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "style/css_test.css")
+  ),
       navbarPage("ERI GLOBAL",
                theme = shinytheme("darkly"),
                #theme = "style/style.css",
@@ -123,7 +121,7 @@ ui <- fluidPage(
                                                             #                "Physical science & Engineering" = 8,
                                                             #                "Climate Change" = 9),
                                                             # selected = 1)),
-                            choices = unique(faculty_list$spec_single))),
+                            choices = unique(faculty_list$specialization))),
                                          # hr(),
                                          # fluidRow(column(3, verbatimTextOutput("value"))),
                          mainPanel(h1("Food Faculty", class = "text-secondary"),
@@ -167,8 +165,8 @@ server <- function(input, output) {
   #Food input df
   table_df_food <- reactive({
     faculty_list %>%
-      filter(spec_single %in% input$food_checkbox) %>%
-      # filter(str_detect(specialization, paste0(input$food_checkbox, collapse = '|'))) %>%
+      # filter(spec_single %in% input$food_checkbox) %>%
+      filter(str_detect(specialization, paste0(input$food_checkbox, collapse = '|'))) %>%
       select(image_url, department, name, email, role, website_url) %>% 
       rename("-" = image_url,
              "Department" = department,
