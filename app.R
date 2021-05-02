@@ -38,11 +38,28 @@ library(shinyalert)
 #Read in data
 #----------------------------------
 
+
+# get all values of specialization
+# a. combine all into one string, split by ';', trim whitespace
+# b. for each value, split by ';', trim whitespace
+#    then unnest or collapse all lists into one long list
+# then make list unique
+
+
 faculty_list <- read_csv(here("data", "faculty_list.csv")) %>% 
   # mutate(spec_single = str_split(specialization, ';')) %>%
   # unnest(spec_single) %>%
   mutate(website_url = sprintf('<a href="%s">UCSB website</a>', website_url),
          image_url = sprintf('<img src="%s"></img>', image_url))
+
+sublist <- faculty_list %>% 
+  select(specialization) %>% 
+  mutate(specialization = str_split(specialization, ';')) %>% 
+  unnest(specialization) %>%
+  mutate(specialization = str_trim(specialization)) %>% 
+  arrange(specialization)
+
+sublist <- unique(sublist)
 
 # #How to separate specializations using str_detect:
 # filter(str_detect(specialization, paste0(input$checkbox_checked, collapse = '|'))
@@ -82,19 +99,22 @@ ui <- fluidPage(
                                                       src = "images/food_home.jpg",
                                                       width = "250px",
                                                       height = "200px",
-                                                      style = "cursor:pointer;"),
-                                                        useShinyjs(),
-                                                          tabsetPanel(id="navbar",
-                                                                      tabPanel("tab1", p("This is tab 1")),
-                                                                      tabPanel("tab2", p("This is tab 2")))),
+                                                      style = "cursor:pointer;")
+                                                  ),
+                                                        # useShinyjs(),
+                                                        #   tabsetPanel(id="navbar",
+                                                        #               tabPanel("tab1", p("This is tab 1")),
+                                                        #               tabPanel("tab2", p("This is tab 2")))),
                                            column(4,
                                                   img(src = "images/water_home.jpg",
                                                       width = "250px",
-                                                      height = "200px")),
+                                                      height = "200px")
+                                                  ),
                                            column(4,
                                                   img(src = "images/energy_home.jpg",
                                                       width = "250px",
-                                                      height = "200px")),
+                                                      height = "200px")
+                                                  ),
                                   )
                                   
                         ),
@@ -121,7 +141,7 @@ ui <- fluidPage(
                                                             #                "Physical science & Engineering" = 8,
                                                             #                "Climate Change" = 9),
                                                             # selected = 1)),
-                            choices = unique(faculty_list$specialization))),
+                            choices = unique(faculty_list$spec_single))),
                                          # hr(),
                                          # fluidRow(column(3, verbatimTextOutput("value"))),
                          mainPanel(h1("Food Faculty", class = "text-secondary"),
@@ -165,7 +185,7 @@ server <- function(input, output) {
   #Food input df
   table_df_food <- reactive({
     faculty_list %>%
-      # filter(spec_single %in% input$food_checkbox) %>%
+      filter(spec_single %in% input$food_checkbox) %>%
       filter(str_detect(specialization, paste0(input$food_checkbox, collapse = '|'))) %>%
       select(image_url, department, name, email, role, website_url) %>% 
       rename("-" = image_url,
