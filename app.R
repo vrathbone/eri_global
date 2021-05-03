@@ -41,7 +41,7 @@ library(shinyalert)
 
 # Read in the dataframe, assign html to website and image URLs
 
-faculty_test <- read_csv(here("data", "faculty_list.csv")) %>% 
+faculty_test <- read_csv(here("data", "faculty_test.csv")) %>% 
   # mutate(spec_single = str_split(specialization, ';')) %>%
   # unnest(spec_single) %>%
   mutate(website_url = sprintf('<a href="%s">UCSB website</a>', website_url),
@@ -181,7 +181,7 @@ server <- function(input, output) {
       # filter(specialization %in% input$food_checkbox) %>%
       filter(str_detect(specialization, paste0(input$food_checkbox, collapse = '|'))) %>%
       select(image_url, department, name, email, role, website_url) %>% 
-      rename("-" = image_url,
+      rename(" " = image_url,
              "Department" = department,
              "Name" = name,
              "Email" = email,
