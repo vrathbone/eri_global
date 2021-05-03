@@ -39,12 +39,7 @@ library(shinyalert)
 #----------------------------------
 
 
-# get all values of specialization
-# a. combine all into one string, split by ';', trim whitespace
-# b. for each value, split by ';', trim whitespace
-#    then unnest or collapse all lists into one long list
-# then make list unique
-
+# Read in the dataframe, assign html to website and image URLs
 
 faculty_test <- read_csv(here("data", "faculty_list.csv")) %>% 
   # mutate(spec_single = str_split(specialization, ';')) %>%
@@ -52,18 +47,15 @@ faculty_test <- read_csv(here("data", "faculty_list.csv")) %>%
   mutate(website_url = sprintf('<a href="%s">UCSB website</a>', website_url),
          image_url = sprintf('<img src="%s"></img>', image_url))
 
+# Make sublist of unique specializations for checkbox to find in faculty list
 sublist_test <- faculty_test %>% 
   select(specialization) %>% 
-  mutate(specialization = str_split(specialization, ';')) %>% 
+  mutate(specialization = str_split(specialization, ';')) %>%
   unnest(specialization) %>%
-  mutate(specialization = str_trim(specialization)) %>% 
+  mutate(specialization = str_trim(specialization)) %>%  #removing whitespace
   arrange(specialization)
 
-sublist_test <- unique(sublist_test)
-
-# #How to separate specializations using str_detect:
-# filter(str_detect(specialization, paste0(input$checkbox_checked, collapse = '|'))
-#        which turns the input$checkbox_checked vector into a pattern of values separated by | which is interpreted as “or” (so, do you detect checkbox 1 OR checkbox 2 OR so on…)
+sublist_test <- unique(sublist_test) #making values unique
 
 
 #----------------------------------
@@ -195,11 +187,7 @@ server <- function(input, output) {
              "Email" = email,
              "Role" = role,
              "UCSB Website" = website_url)
-      # mutate(id = as.numeric(factor(spec_single))) %>%
-      # pivot_wider(spec_single,
-      #             names_from = spec_single,
-      #             values_from = id)
-
+    
   })
   
   #Food output table
