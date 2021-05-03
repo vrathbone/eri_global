@@ -46,20 +46,20 @@ library(shinyalert)
 # then make list unique
 
 
-faculty_list <- read_csv(here("data", "faculty_list.csv")) %>% 
+faculty_test <- read_csv(here("data", "faculty_list.csv")) %>% 
   # mutate(spec_single = str_split(specialization, ';')) %>%
   # unnest(spec_single) %>%
   mutate(website_url = sprintf('<a href="%s">UCSB website</a>', website_url),
          image_url = sprintf('<img src="%s"></img>', image_url))
 
-sublist <- faculty_list %>% 
+sublist_test <- faculty_test %>% 
   select(specialization) %>% 
   mutate(specialization = str_split(specialization, ';')) %>% 
   unnest(specialization) %>%
   mutate(specialization = str_trim(specialization)) %>% 
   arrange(specialization)
 
-sublist <- unique(sublist)
+sublist_test <- unique(sublist_test)
 
 # #How to separate specializations using str_detect:
 # filter(str_detect(specialization, paste0(input$checkbox_checked, collapse = '|'))
@@ -141,7 +141,8 @@ ui <- fluidPage(
                                                             #                "Physical science & Engineering" = 8,
                                                             #                "Climate Change" = 9),
                                                             # selected = 1)),
-                            choices = unique(faculty_list$spec_single))),
+                            choices = unique(sublist_test$specialization))),
+                            # choices = unique(faculty_list$spec_single))),
                                          # hr(),
                                          # fluidRow(column(3, verbatimTextOutput("value"))),
                          mainPanel(h1("Food Faculty", class = "text-secondary"),
@@ -184,8 +185,8 @@ server <- function(input, output) {
   ####Food Tab####
   #Food input df
   table_df_food <- reactive({
-    faculty_list %>%
-      filter(spec_single %in% input$food_checkbox) %>%
+    faculty_test %>%
+      # filter(specialization %in% input$food_checkbox) %>%
       filter(str_detect(specialization, paste0(input$food_checkbox, collapse = '|'))) %>%
       select(image_url, department, name, email, role, website_url) %>% 
       rename("-" = image_url,
