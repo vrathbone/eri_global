@@ -57,14 +57,23 @@ sublist_test <- faculty_list %>%
 
 sublist_test <- unique(sublist_test) #making values unique
 
+sublist_food <- sublist_test %>% 
+  filter(specialization %in% c("Agriculture", "Climate Change", "Ecology & Conservation", "Economics & Policy", "Fisheries & Aquaculture", "Land Use", "Physical Science & Engineering", "Social Sciences & Anthropology", "Soil"))
+
+sublist_water <- sublist_test %>% 
+  filter(specialization %in% c("Climate Change", "Conservation", "Economics & Policy", "Hydrology", "Policy", "Social Sciences", "Water Resources"))
+
+sublist_energy <- sublist_test %>% 
+  filter(specialization %in% c("Climate Change", "Economics & Policy", "Engineering", "Social Sciences", "Technology", "Transportation"))
+
 
 #----------------------------------
 #Create the user interface:
 #----------------------------------
 ui <- fluidPage(
   tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "style/css_test.css")
-  ),
+    tags$link(rel = "stylesheet", type = "text/css", href = "style/css_test.css"),
+    tags$script("src" = "test_link.js")),
       navbarPage("ERI GLOBAL",
                theme = shinytheme("darkly"),
 
@@ -90,7 +99,8 @@ ui <- fluidPage(
                                                       src = "images/food_home.jpg",
                                                       width = "250px",
                                                       height = "200px",
-                                                      style = "cursor:pointer;")
+                                                      style = "cursor:pointer;",
+                                                      tags$a(" ", onclick = "customHref('Food_tab')"))
                                                   ),
                                                         # useShinyjs(),
                                                         #   tabsetPanel(id="navbar",
@@ -132,7 +142,7 @@ ui <- fluidPage(
                                                             #                "Physical science & Engineering" = 8,
                                                             #                "Climate Change" = 9),
                                                             # selected = 1)),
-                            choices = unique(sublist_test$specialization))),
+                            choices = unique(sublist_food$specialization))),
                             # choices = unique(faculty_list$spec_single))),
                                          # hr(),
                                          # fluidRow(column(3, verbatimTextOutput("value"))),
@@ -153,7 +163,7 @@ ui <- fluidPage(
                         #                  selectInput("select", label = h3("Select a specialization:"),
                         #                              choices = list("Hydrology" = 1, "Water Resources" = 2, "Markets" = 3, "Conservation" = 4, "Climate Change" = 5, "Economics" = 6, "Policy" = 7),
                         #                              selected = 1)),
-                          choices = unique(sublist_test$specialization))),
+                          choices = unique(sublist_water$specialization))),
                         mainPanel(h1("Water Faculty", class = "text-secondary"),
                                   tableOutput("table_water"))
                   )),
@@ -170,7 +180,7 @@ ui <- fluidPage(
                                                     #                  selectInput("select", label = h3("Select a specialization:"),
                                                     #                              choices = list("Hydrology" = 1, "Water Resources" = 2, "Markets" = 3, "Conservation" = 4, "Climate Change" = 5, "Economics" = 6, "Policy" = 7),
                                                     #                              selected = 1)),
-                                                    choices = unique(sublist_test$specialization))),
+                                choices = unique(sublist_energy$specialization))),
                     mainPanel(h1("Energy Faculty", class = "text-secondary"),
                               tableOutput("table_energy"))
                   ))
