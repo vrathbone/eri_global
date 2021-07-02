@@ -41,14 +41,14 @@ library(shinyalert)
 
 # Read in the dataframe, assign html to website and image URLs
 
-faculty_test <- read_csv(here("data", "faculty_test.csv")) %>% 
+faculty_list <- read_csv(here("data", "faculty_list.csv")) %>% 
   # mutate(spec_single = str_split(specialization, ';')) %>%
   # unnest(spec_single) %>%
   mutate(website_url = sprintf('<a href="%s">UCSB website</a>', website_url),
          image_url = sprintf('<img src="%s"></img>', image_url))
 
 # Make sublist of unique specializations for checkbox to find in faculty list
-sublist_test <- faculty_test %>% 
+sublist_test <- faculty_list %>% 
   select(specialization) %>% 
   mutate(specialization = str_split(specialization, ';')) %>%
   unnest(specialization) %>%
@@ -67,7 +67,6 @@ ui <- fluidPage(
   ),
       navbarPage("ERI GLOBAL",
                theme = shinytheme("darkly"),
-               #theme = "style/style.css",
 
                ####INTRO tab####
                tabPanel(title = "Intro",
@@ -138,31 +137,43 @@ ui <- fluidPage(
                                          # hr(),
                                          # fluidRow(column(3, verbatimTextOutput("value"))),
                          mainPanel(h1("Food Faculty", class = "text-secondary"),
-                                   tableOutput("table"))
+                                   tableOutput("table_food"))
                                    
          )),
          
                 ####WATER Tab####
                 tabPanel(title = "Water",
                         icon = icon("search"),
+                        value = "Food_tab",
                         sidebarLayout(
-                            sidebarPanel(h3("Select a specialization", class = "text-success"),
-                                         selectInput("select", label = h3("Select a specialization:"),
-                                                     choices = list("Hydrology" = 1, "Water Resources" = 2, "Markets" = 3, "Conservation" = 4, "Climate Change" = 5, "Economics" = 6, "Policy" = 7),
-                                                     selected = 1)),
-                            mainPanel(h1("Water Faculty", class = "text-secondary"))
+                            sidebarPanel(h3("Explore Faculty", class = "text-success"),
+                                         checkboxGroupInput("water_checkbox", label = h3("Select Specializations:"),
+                        # sidebarLayout(
+                        #     sidebarPanel(h3("Select a specialization", class = "text-success"),
+                        #                  selectInput("select", label = h3("Select a specialization:"),
+                        #                              choices = list("Hydrology" = 1, "Water Resources" = 2, "Markets" = 3, "Conservation" = 4, "Climate Change" = 5, "Economics" = 6, "Policy" = 7),
+                        #                              selected = 1)),
+                          choices = unique(sublist_test$specialization))),
+                        mainPanel(h1("Water Faculty", class = "text-secondary"),
+                                  tableOutput("table_water"))
                   )),
-         
+
                 ####ENERGY Tab####
-                tabPanel(title = "Energy",
-                        icon = icon("search"),
-                        sidebarLayout(
-                            sidebarPanel(h3("Select a specialization",class = "text-success"),
-                                         selectInput("select", label = h3("Select a specialization:"),
-                                                     choices = list("Engineering" = 1, "Technology" = 2, "Social Sciences" = 3, "Climate Change" = 4, "Renewables" = 5, "Transportation" = 6, "Economics" = 7, "Policy" = 8),
-                                                     selected = 1)),
-                            mainPanel(h1("Energy Faculty", class = "text-secondary"))
-                        ))
+         tabPanel(title = "Energy",
+                  icon = icon("search"),
+                  value = "Food_tab",
+                  sidebarLayout(
+                    sidebarPanel(h3("Explore Faculty", class = "text-success"),
+                                 checkboxGroupInput("energy_checkbox", label = h3("Select Specializations:"),
+                                                    # sidebarLayout(
+                                                    #     sidebarPanel(h3("Select a specialization", class = "text-success"),
+                                                    #                  selectInput("select", label = h3("Select a specialization:"),
+                                                    #                              choices = list("Hydrology" = 1, "Water Resources" = 2, "Markets" = 3, "Conservation" = 4, "Climate Change" = 5, "Economics" = 6, "Policy" = 7),
+                                                    #                              selected = 1)),
+                                                    choices = unique(sublist_test$specialization))),
+                    mainPanel(h1("Energy Faculty", class = "text-secondary"),
+                              tableOutput("table_energy"))
+                  ))
          
          )
          
@@ -177,7 +188,7 @@ server <- function(input, output) {
   ####Food Tab####
   #Food input df
   table_df_food <- reactive({
-    faculty_test %>%
+    faculty_list %>%
       # filter(specialization %in% input$food_checkbox) %>%
       filter(str_detect(specialization, paste0(input$food_checkbox, collapse = '|'))) %>%
       select(image_url, department, name, email, role, website_url) %>% 
@@ -191,10 +202,52 @@ server <- function(input, output) {
   })
   
   #Food output table
-  output$table <- renderTable({
+  output$table_food <- renderTable({
     table_df_food()
   }, sanitize.text.function = function(x)x)
   
+  ####Water Tab####
+  #Water input df
+  table_df_water <- reactive({
+    faculty_list %>%
+      # filter(specialization %in% input$food_checkbox) %>%
+      filter(str_detect(specialization, paste0(input$water_checkbox, collapse = '|'))) %>%
+      select(image_url, department, name, email, role, website_url) %>%
+      rename(" " = image_url,
+             "Department" = department,
+             "Name" = name,
+             "Email" = email,
+             "Role" = role,
+             "UCSB Website" = website_url)
+
+  })
+
+  #Water output table
+  output$table_water <- renderTable({
+    table_df_water()
+  }, sanitize.text.function = function(x)x)
+  
+  ####Energy Tab####
+  #Energy input df
+  table_df_energy <- reactive({
+    faculty_list %>%
+      # filter(specialization %in% input$food_checkbox) %>%
+      filter(str_detect(specialization, paste0(input$energy_checkbox, collapse = '|'))) %>%
+      select(image_url, department, name, email, role, website_url) %>%
+      rename(" " = image_url,
+             "Department" = department,
+             "Name" = name,
+             "Email" = email,
+             "Role" = role,
+             "UCSB Website" = website_url)
+    
+  })
+  
+  #Water output table
+  output$table_energy <- renderTable({
+    table_df_energy()
+  }, sanitize.text.function = function(x)x)
+
 #   #Homepage images to tabs
 #   shinyjs::onclick("food_home",  updateTabsetPanel(session, inputId="navbar", selected="tab2"))
 
@@ -217,5 +270,5 @@ shinyApp(ui = ui, server = server)
 
 #Food tab test
 # output$table <- renderDataTable({
-#   subset(faculty_test, specialization %in% input$specialization, select = "name")
+#   subset(faculty_list, specialization %in% input$specialization, select = "name")
 # })

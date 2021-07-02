@@ -3,4 +3,5 @@
 /* Force all faculty images to be the same size */
 .tab-pane[data-value="Food_tab"] img {
   max-width: 120px;
+  max-height: 130px;
 }
