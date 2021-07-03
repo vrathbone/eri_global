@@ -73,7 +73,7 @@ sublist_energy <- sublist_test %>%
 ui <- fluidPage(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "style/css_test.css"),
-    tags$script("src" = "test_link.js")),
+    tags$script("src" = "test_link.js")), #testing image links
       navbarPage("ERI GLOBAL",
                theme = shinytheme("darkly"),
 
