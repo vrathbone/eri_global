@@ -1,7 +1,14 @@
-
-
 /* Force all faculty images to be the same size */
-.tab-pane[data-value="Food_tab"] img {
-  max-width: 120px;
-  max-height: 130px;
+.tab-pane[data-value="Food_tab"] img,
+.tab-pane[data-value="Water_tab"] img,
+.tab-pane[data-value="Energy_tab"] img {
+  display: block;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+}
+
+/* Changing fonts */
+h1, h2, h3 {
+  font-family: 'Impact';
 }
