@@ -12,3 +12,15 @@
 h1, h2, h3 {
   font-family: 'Impact';
 }
+
+.radio label,
+.checkbox label {
+  font-family: "courier";
+}
+
+/* Standardize nav page image sizes */
+.clickable-images img {
+  width: 250px;
+  height: 200px;
+  cursor: pointer;
+}

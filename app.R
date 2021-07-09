@@ -1,6 +1,6 @@
 
 # Shiny App for the Global Food Initiative in collaboration with UCSB and ERI
-# 
+# See the Read.me file for further details
 
 #----------------------------------
 # Attach packages  
@@ -65,17 +65,15 @@ sublist_energy <- sublist %>%
 #----------------------------------
 
 # Using fluidPage() to make the site reactive to different displays (i.e. works on a phone, tablet or desktop)
-# Here, you can pull in the css file. It's stored in the www/style folder, the css right now only controls the size of the faculty images to display them as uniform thumbnails
-# ANY images/logos (besides faculty images) need to be stored in the www folder or they will not be displayed
+# ANY images/logos (besides faculty image links) need to be stored in the www folder or they will not be displayed
 
+####UI####
 ui <- fluidPage(
-  tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "style/css_test.css"),
-    tags$script("src" = "test_link.js")), #testing image links
-      navbarPage("ERI GLOBAL",
+    navbarPage("ERI GLOBAL",
                theme = shinytheme("darkly"), #many theme options, can change
   # navbarPage(title = div(img(src='global_food_logo_white.png',style="margin-top: -14px; padding-right:10px;padding-bottom:10px", height = 60)),
   #            windowTitle="ERI GLOBAL",
+
 
                ####INTRO tab####
                # This is the main "landing page" for the site
@@ -94,28 +92,29 @@ ui <- fluidPage(
                                      br(),
                                      "This is a database of faculty at UCSB who's research is involved with sustainable food systems. This purpose of this database is to serve as an up to date, live asset map for faculty involved to be hosted in one place. Currently, there are 50+ faculty in the database. If you don't see someone who you think should be included please send their information to XXXX. "),
                                   hr(),
-                                  fluidRow(column(4,
-                                                  img(id = "food_home",
-                                                      src = "images/food_home.jpg",
-                                                      width = "250px",
-                                                      height = "200px",
-                                                      style = "cursor:pointer;",
-                                                      tags$a(" ", onclick = "customHref('Food_tab')"))
-                                                  ),
-                                                        # useShinyjs(),
-                                                        #   tabsetPanel(id="navbar",
-                                                        #               tabPanel("tab1", p("This is tab 1")),
-                                                        #               tabPanel("tab2", p("This is tab 2")))),
+                                  fluidRow(class="clickable-images",
                                            column(4,
-                                                  img(src = "images/water_home.jpg",
-                                                      width = "250px",
-                                                      height = "200px")
+                                                  tags$a(" ", onclick = "customHref('Food_tab')",
+                                                  tags$img(id = "food_home",
+                                                           src = "images/food_home.jpg"
+                                                          
+                                                  )
+                                                    
+                                                  )
                                                   ),
                                            column(4,
-                                                  img(src = "images/energy_home.jpg",
-                                                      width = "250px",
-                                                      height = "200px")
+                                                  tags$a(" ", onclick = "customHref('Water_tab')",
+                                                  tags$img(src = "images/water_home.jpg"
+                                                    
+                                                           )
+                                                  )
                                                   ),
+                                           column(4,
+                                                  tags$a(" ", onclick = "customHref('Energy_tab')",
+                                                         tags$img(src = "images/energy_home.jpg"
+                                                         )
+                                                  )
+                                           ),
                                   )
                                   
                         ),
@@ -125,7 +124,7 @@ ui <- fluidPage(
                         
                         ),
 
-                ####FOOD Tab####
+               ####FOOD Tab####
                 tabPanel(title = "Food",
                         icon = icon("search"),
                         value = "Food_tab", #have to keep camel case otherwise css won't work
@@ -138,7 +137,7 @@ ui <- fluidPage(
                                    
          )),
          
-                ####WATER Tab####
+               ####WATER Tab####
                 tabPanel(title = "Water",
                         icon = icon("search"),
                         value = "Water_tab",
@@ -150,7 +149,7 @@ ui <- fluidPage(
                                   tableOutput("table_water"))
                   )),
 
-                ####ENERGY Tab####
+               ####ENERGY Tab####
                 tabPanel(title = "Energy",
                          icon = icon("search"),
                          value = "Energy_tab",
@@ -162,10 +161,17 @@ ui <- fluidPage(
                                      tableOutput("table_energy"))
                   ))
          
-         )
+         ),
+  ####CSS####
+  # Here, you can pull in the css file and link to any javascript files. The css file is stored in the www/style folder and the js file is in the www folder. The js file is allowing the "Food/Water/Energy" images on the nav page to link to each tab.  
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "style/css_test.css"), #faculty image thumbnails and other style formatting
+    tags$script("src" = "test_link.js") #image links
+  ) 
          
 )
                
+
 #--------------------------
 # Server
 #--------------------------
@@ -244,15 +250,3 @@ server <- function(input, output) {
 
 shinyApp(ui = ui, server = server)
 
-
-#--------------------------
-# Parking Lot
-#--------------------------
-
-#Checkbox Widget
-# output$value <- renderPrint({ input$checkGroup })
-
-#Food tab test
-# output$table <- renderDataTable({
-#   subset(faculty_list, specialization %in% input$specialization, select = "name")
-# })

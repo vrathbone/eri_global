@@ -1,9 +1,12 @@
 var customHref = function(tabName) {
-	var dropdownList = document.getElementsByTagName( class="value">"a");
-		for (var i = 0; i < dropdownList.length; i++) {
-		    var link = dropdownList[i];
-		    if(link.getAttribute("data-value") == tabName) {
-			link.click();
+	var navList = document.querySelectorAll(".navbar-nav a");
+	for (const link of navList) {
+	  if (link.getAttribute("data-value") == tabName) {
+	  	link.click();
+	  	setTimeout(() => {
+	  	  window.scrollTo(0, 0);
+	  	}, 0);
+	  	break;
 		}
 	}
 };
