@@ -1,6 +1,6 @@
 
 # Shiny App for the Global Food Initiative in collaboration with UCSB and ERI
-# See the Read.me file for further details
+# See the Read.me file for further details.
 
 #----------------------------------
 # Attach packages  
