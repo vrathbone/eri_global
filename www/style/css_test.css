@@ -8,15 +8,15 @@
   object-fit: cover;
 }
 
-/* Changing fonts */
+/* Changing fonts
 h1, h2, h3 {
   font-family: 'Impact';
-}
+} */
 
-.radio label,
+/* .radio label,
 .checkbox label {
   font-family: "courier";
-}
+} */
 
 /* Standardize nav page image sizes */
 .clickable-images img {
