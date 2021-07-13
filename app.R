@@ -1,6 +1,6 @@
-
 # Shiny App for the Global Food Initiative in collaboration with UCSB and ERI
 # See the Read.me file for further details.
+# Written by: Vanessa Rathbone
 
 #----------------------------------
 # Attach packages  
@@ -30,13 +30,13 @@ library(shinyalert)
 #----------------------------------
 
 # Read in the faculty list dataframe, assign html links to individual faculty websites and image URLs
-# If you want add more URls, assign them within the mutate() function, remember you will also need to call them in the reactive{()} function in the server. 
+# If you want add more columns from the spreadsheet (faculty_list), first add them to the list and re-read in the file, then assign them within the mutate() function below. Remember you will ALSO need to call the specific columns in the reactive{()} function in the server. 
 
 faculty_list <- read_csv(here("data", "faculty_list.csv")) %>% 
   mutate(website_url = sprintf('<a href="%s">UCSB website</a>', website_url),
          image_url = sprintf('<img src="%s"></img>', image_url))
 
-# Make a list of unique specializations for checkboxes from the faculty list
+# Make a list of unique specializations for checkboxes from the faculty list.
 # No need to change this code as long as the specializations are entered into the faculty_list.csv and are separated with a semicolon.
 
 sublist <- faculty_list %>% 
@@ -48,7 +48,7 @@ sublist <- faculty_list %>%
 
 sublist <- unique(sublist) #making values unique
 
-#make sublists for each tab (food, water, energy)
+#make sublists of specific specializations for each tab (food, water, energy)
 
 sublist_food <- sublist %>%
   filter(specialization %in% c("Agriculture", "Climate Change", "Ecology & Conservation", "Economics & Policy", "Fisheries & Aquaculture", "Land Use", "Physical Science & Engineering", "Social Sciences & Anthropology", "Soil"))
@@ -71,9 +71,6 @@ sublist_energy <- sublist %>%
 ui <- fluidPage(
     navbarPage("ERI GLOBAL",
                theme = shinytheme("darkly"), #many theme options, can change
-  # navbarPage(title = div(img(src='global_food_logo_white.png',style="margin-top: -14px; padding-right:10px;padding-bottom:10px", height = 60)),
-  #            windowTitle="ERI GLOBAL",
-
 
                ####INTRO tab####
                # This is the main "landing page" for the site
@@ -182,7 +179,7 @@ server <- function(input, output) {
   #Food input df
   table_df_food <- reactive({
     faculty_list %>%
-      filter(str_detect(specialization, paste0(input$food_checkbox, collapse = '|'))) %>%
+      filter(str_detect(specialization, paste0(input$food_checkbox, collapse = '|'))) %>% #don't mess with this line of code, it's reactive to the checkbox inputs based on specified faculty specializations
       select(image_url, department, name, email, role, website_url) %>% 
       rename(" " = image_url,
              "Department" = department,
@@ -238,9 +235,6 @@ server <- function(input, output) {
     table_df_energy()
   }, sanitize.text.function = function(x)x)
 
-#   #Homepage images to tabs
-#   shinyjs::onclick("food_home",  updateTabsetPanel(session, inputId="navbar", selected="tab2"))
-
 }
 
 
@@ -248,5 +242,5 @@ server <- function(input, output) {
 # Run the application 
 #--------------------------
 
-shinyApp(ui = ui, server = server)
+shinyApp(ui = ui, server = server) #need this line of code to run the app
 
