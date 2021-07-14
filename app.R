@@ -76,7 +76,6 @@ ui <- fluidPage(
                # This is the main "landing page" for the site
                tabPanel(title = "Intro",
                         icon = icon("user-circle"),
-                        #includeHTML("home.html"),
                         mainPanel(width = 20,
                                   align = "center",
                                   h2(strong("Global Food Initiative")),
