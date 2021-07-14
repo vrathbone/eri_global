@@ -111,15 +111,24 @@ ui <- fluidPage(
                                                          tags$img(src = "images/energy_home.jpg"
                                                          )
                                                   )
-                                           ),
-                                  )
+                                           )
+                                  ),
                                   
-                        ),
-                        br(),
+                        
+                      
                         br(),
                         hr(),
-                        
+                        br(),
+                        fluidRow(div(img(src = "images/global_food_logo_white.png",
+                                         width = "25%"),
+                                     style="text-align: center;")
+                                 ),
+                               )
                         ),
+               
+               br(),
+               br(),
+               
 
                ####FOOD Tab####
                 tabPanel(title = "Food",
